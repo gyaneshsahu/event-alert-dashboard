@@ -97,4 +97,7 @@ def generate_alerts(api_key, station_df, max_distance_km=3):
     df_alerts['Impact Level'] = df_alerts['Venue'].apply(classify_impact)
     df_alerts = df_alerts.drop_duplicates(subset=['Event', 'Date', 'Time'])
 
-    return df_alerts[['Event', 'Date', 'Time', 'Venue', 'Nearest Station', 'Lines', 'Distance (km)', 'Impact Level']]
+
+    return df_alerts[['Event', 'Date', 'Time', 'Venue', 'Nearest Station', 'Lines',
+                  'Distance (km)', 'Impact Level', 'Latitude', 'Longitude']]
+
