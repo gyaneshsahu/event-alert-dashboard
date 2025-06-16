@@ -2,6 +2,7 @@
 
 import streamlit as st
 import pandas as pd
+import pydeck as pdk
 from event_processing import load_stations, generate_alerts
 
 # --- Config ---
@@ -24,6 +25,46 @@ if st.button("🔍 Fetch Upcoming Events"):
     if not alerts_df.empty:
         st.success(f"Found {len(alerts_df)} relevant event(s) near S-Bahn stations.")
         st.dataframe(alerts_df, use_container_width=True)
+
+        # --- Add Map ---
+        st.subheader("🗺️ Event Impact Map (Stations)")
+        alerts_df['Latitude'] = alerts_df['Latitude'].astype(float)
+        alerts_df['Longitude'] = alerts_df['Longitude'].astype(float)
+
+        # Map color based on impact
+        def impact_color(level):
+            if level == 'HIGH':
+                return [255, 0, 0]
+            elif level == 'MEDIUM':
+                return [255, 165, 0]
+            else:
+                return [0, 128, 0]
+
+        alerts_df['Color'] = alerts_df['Impact Level'].apply(impact_color)
+
+        layer = pdk.Layer(
+            "ScatterplotLayer",
+            data=alerts_df,
+            get_position='[Longitude, Latitude]',
+            get_color='Color',
+            get_radius=300,
+            pickable=True,
+        )
+
+        view_state = pdk.ViewState(
+            latitude=alerts_df['Latitude'].mean(),
+            longitude=alerts_df['Longitude'].mean(),
+            zoom=11,
+            pitch=0
+        )
+
+        st.pydeck_chart(pdk.Deck(
+            map_style='mapbox://styles/mapbox/light-v9',
+            initial_view_state=view_state,
+            layers=[layer],
+            tooltip={"text": "{Event} @ {Venue}\nImpact: {Impact Level}"}
+        ))
+
     else:
         st.warning("No upcoming events found near S-Bahn stations.")
 else:
