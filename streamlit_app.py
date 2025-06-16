@@ -6,7 +6,7 @@ from event_processing import load_stations, generate_alerts
 
 # --- Config ---
 st.set_page_config(page_title="S-Bahn Event Alert System", layout="wide")
-API_KEY = "vy68px4NjiKP1lYkQQBwuaxFyLlrV8Iv"  # Replace with your Ticketmaster API key
+API_KEY = st.secrets["API_KEY"]
 
 # --- Title ---
 st.title("🚨 Hannover S-Bahn Event Impact Dashboard")
